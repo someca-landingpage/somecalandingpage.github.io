@@ -207,7 +207,9 @@ footer{background:var(--profondo);color:#b3c3a1;padding:54px 0 96px;font-size:14
 .sticky .cta::before{display:none}
 
 /* ---------- finestra preventivo ---------- */
-dialog{border:0;border-radius:28px;padding:0;width:min(580px,100% - 28px);max-height:94vh;box-shadow:0 40px 100px rgba(0,0,0,.5);color:var(--testo);background:#fff;overflow:auto}
+dialog{border:0;border-radius:24px;padding:0;margin:auto;width:min(580px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(92svh,880px);box-shadow:0 40px 100px rgba(0,0,0,.5);color:var(--testo);background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+html:has(dialog[open]),body:has(dialog[open]){overflow:hidden}
+@media (max-width:640px){dialog{border-radius:20px;max-height:94svh;width:calc(100vw - 16px);max-width:calc(100vw - 16px)}.dlg{padding:30px 18px 22px}.dlg h3{font-size:24px;padding-right:40px}.dlg p.s{font-size:14px;margin:8px 0 16px}.x{right:10px;top:10px;width:36px;height:36px;font-size:20px}input,select,textarea{font-size:16px;padding:13px}.mix-c{flex:0 0 118px;height:96px}}
 dialog[open]{animation:su .45s var(--ease)}
 @keyframes su{from{opacity:0;transform:translateY(30px) scale(.97)}}
 dialog::backdrop{background:rgba(10,20,5,.7);backdrop-filter:blur(5px)}
@@ -309,7 +311,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
 
 <header id="hd">
   <div class="container bar">
-    <a class="logo" href="#top" aria-label="Someca Infissi"><img src="assets/logo.png" alt="Someca Infissi"></a>
+    <a class="logo" href="#top" aria-label="Someca Infissi"><img src="assets/logo%20(2).png" alt="Someca Infissi"></a>
     <button class="cta sm" type="button" data-preventivo>Preventivo gratuito</button>
   </div>
 </header>
@@ -544,7 +546,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
 <footer id="contatti">
   <div class="container">
     <div class="foot">
-      <div><a class="logo" href="#top"><img src="assets/logo.png" alt="Someca Infissi"></a><p>Someca Srl · Showroom e produzione<br>Via Cerqua S. Antonio Z.I.<br>80030 Scisciano (NA)</p></div>
+      <div><a class="logo" href="#top"><img src="assets/logo%20(2).png" alt="Someca Infissi"></a><p>Someca Srl · Showroom e produzione<br>Via Cerqua S. Antonio Z.I.<br>80030 Scisciano (NA)</p></div>
       <div><h4>Telefono</h4><p>+39 081 519 8379<br>+39 081 519 8196</p></div>
       <div><h4>Email</h4><p><a href="mailto:info@someca.it">info@someca.it</a><br><a href="mailto:sprint@someca.it">sprint@someca.it</a></p></div>
       <div><h4>Seguici</h4><div class="soc-row">
@@ -570,7 +572,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     <div id="vista-form">
       <h3 id="dlg-t">Richiedi il tuo preventivo</h3>
       <p class="s">Gratuito e senza impegno. Ti richiamiamo entro un giorno lavorativo.</p>
-      <form id="lead-form" name="preventivo" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+      <form id="lead-form" name="preventivo" method="POST" action="https://formsubmit.co/ajax/sprint@someca.it" novalidate>
         <input type="hidden" name="form-name" value="preventivo">
         <p class="hp" aria-hidden="true"><label>Non compilare<input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="mix" aria-label="Panoramica prodotti">
@@ -726,7 +728,19 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     if(dati.get('messaggio')) righe.push('Messaggio: '+dati.get('messaggio'));
     $('#wa').href='https://wa.me/'+NUMERO_WHATSAPP+'?text='+encodeURIComponent(righe.join('\n'));
     try{
-      const r=await fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(dati).toString()});
+      const payload={
+        Nome:dati.get('nome')||'',
+        Telefono:dati.get('telefono')||'',
+        Prodotto:dati.get('prodotto')||'',
+        Comune:dati.get('comune')||'-',
+        Messaggio:dati.get('messaggio')||'-',
+        ConsensoPrivacy:dati.get('privacy')||'',
+        _subject:'Nuova richiesta preventivo - sito Someca',
+        _cc:'info@someca.it,matrisciano.sebastiano@gmail.com',
+        _template:'table',
+        _captcha:'false'
+      };
+      const r=await fetch('https://formsubmit.co/ajax/sprint@someca.it',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
       if(!r.ok) throw new Error('invio non riuscito');
     }catch(_){
       err.textContent='Invio non riuscito. Riprova tra poco oppure chiamaci al +39 081 519 8379.'; err.style.display='block'; return;
