@@ -731,19 +731,36 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     if(dati.get('messaggio')) righe.push('Messaggio: '+dati.get('messaggio'));
     $('#wa').href='https://wa.me/'+NUMERO_WHATSAPP+'?text='+encodeURIComponent(righe.join('\n'));
     try{
-      const payload={
-        nome:dati.get('nome')||'',
-        telefono:dati.get('telefono')||'',
-        prodotto:dati.get('prodotto')||'',
-        comune:dati.get('comune')||'',
-        messaggio:dati.get('messaggio')||'',
-        privacy:dati.get('privacy')||'',
-        bot_field:dati.get('bot-field')||''
+      const inviaEmail=async()=>{
+        const r=await fetch('https://formsubmit.co/ajax/sprint@someca.it',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
+          Nome:dati.get('nome')||'',
+          Telefono:dati.get('telefono')||'',
+          Prodotto:dati.get('prodotto')||'',
+          Comune:dati.get('comune')||'-',
+          Messaggio:dati.get('messaggio')||'-',
+          _subject:'Nuova richiesta preventivo - sito Someca',
+          _cc:'info@someca.it,matrisciano.sebastiano@gmail.com',
+          _template:'table',
+          _captcha:'false'
+        })});
+        return r.ok;
       };
-      const r=await fetch('https://lyra-8c237e00.base44.app/functions/somecaLead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      const esito=await r.json().catch(()=>({}));
-      if(!r.ok||esito.ok!==true) throw new Error('invio non riuscito');
-      if(!r.ok) throw new Error('invio non riuscito');
+      const salvaBackup=async()=>{
+        const r=await fetch('https://lyra-8c237e00.base44.app/functions/somecaLead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          nome:dati.get('nome')||'',
+          telefono:dati.get('telefono')||'',
+          prodotto:dati.get('prodotto')||'',
+          comune:dati.get('comune')||'',
+          messaggio:dati.get('messaggio')||'',
+          privacy:dati.get('privacy')||'',
+          bot_field:dati.get('bot-field')||''
+        })});
+        return r.ok;
+      };
+      let emailOk=false, backupOk=false;
+      try{ emailOk=await inviaEmail(); }catch(_){ emailOk=false; }
+      if(!emailOk){ try{ backupOk=await salvaBackup(); }catch(_){ backupOk=false; } }
+      if(!emailOk && !backupOk) throw new Error('invio non riuscito');
     }catch(_){
       err.textContent='Invio automatico non riuscito: ti apriamo WhatsApp con la richiesta già scritta.';
       err.style.display='block';
