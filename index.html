@@ -207,13 +207,16 @@ footer{background:var(--profondo);color:#b3c3a1;padding:54px 0 96px;font-size:14
 .sticky .cta::before{display:none}
 
 /* ---------- finestra preventivo ---------- */
-dialog{border:0;border-radius:24px;padding:0;margin:auto;width:min(580px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(92svh,880px);box-shadow:0 40px 100px rgba(0,0,0,.5);color:var(--testo);background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+dialog{border:0;border-radius:24px;padding:0;margin:auto;width:min(580px,calc(100vw - 20px));max-width:calc(100vw - 20px);max-height:calc(100dvh - 16px);background:#fff;color:var(--testo);box-shadow:0 40px 100px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column}
 html:has(dialog[open]),body:has(dialog[open]){overflow:hidden}
-@media (max-width:640px){dialog{border-radius:20px;max-height:94svh;width:calc(100vw - 16px);max-width:calc(100vw - 16px)}.dlg{padding:30px 18px 22px}.dlg h3{font-size:24px;padding-right:40px}.dlg p.s{font-size:14px;margin:8px 0 16px}.x{right:10px;top:10px;width:36px;height:36px;font-size:20px}input,select,textarea{font-size:16px;padding:13px}.mix-c{flex:0 0 118px;height:96px}}
+@media (max-width:640px){dialog{border-radius:20px;width:calc(100vw - 16px);max-width:calc(100vw - 16px)}.dlg{padding:24px 16px 16px}.dlg h3{font-size:23px;padding-right:38px}.dlg p.s{font-size:13.5px;margin:6px 0 12px}.x{right:10px;top:10px;width:36px;height:36px;font-size:20px}input,select,textarea{font-size:16px;padding:12px;border-radius:12px}form{gap:10px}.row2{gap:10px}.mix-c{flex:0 0 112px;height:92px}}
 dialog[open]{animation:su .45s var(--ease)}
 @keyframes su{from{opacity:0;transform:translateY(30px) scale(.97)}}
 dialog::backdrop{background:rgba(10,20,5,.7);backdrop-filter:blur(5px)}
-.dlg{padding:36px 34px 32px}
+.dlg{padding:34px 32px 28px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain}
+.dlg::-webkit-scrollbar{display:none;width:0;height:0}
+@media (max-height:800px){.dlg{padding:26px 26px 22px;}.dlg h3{font-size:26px}.dlg p.s{margin:6px 0 12px}form{gap:11px}.mix{margin:0 0 2px}.mix-r{display:none}}
+@media (max-height:700px){.dlg h3{font-size:22px}.dlg p.s{display:none}.mix{display:none}textarea{height:54px}input,select,textarea{padding:11px}form{gap:9px}}
 .dlg h3{font:600 30px/1.1 var(--serif);padding-right:44px}
 .dlg p.s{color:var(--muted);font-size:15px;margin:10px 0 22px}
 .x{position:absolute;right:14px;top:12px;width:40px;height:40px;border-radius:50%;border:0;background:var(--verde-tinta);font-size:22px;cursor:pointer;color:var(--profondo)}
@@ -331,7 +334,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
   <video id="vid" autoplay muted loop playsinline preload="metadata" poster="assets/cover-drone.jpg" aria-hidden="true"><source src="assets/hero.mp4" type="video/mp4"></video>
   <div class="container hero-in">
     <span class="eyebrow">Produzione propria dal 1984 · Scisciano (NA)</span>
-    <h1>Casa tua, <em>vista da fuori</em> e da dentro.</h1>
+    <h1>Casa tua, <em>vista da fuori</em>&nbsp;e&nbsp;da&nbsp;dentro.</h1>
     <p class="lead">Finestre, porte, portoni, tapparelle e pergole prodotti da noi, a Scisciano. Dal sopralluogo alla posa, con un solo interlocutore e <strong>preventivo gratuito</strong>.</p>
     <div class="hero-row">
       <button class="cta" type="button" data-preventivo>Preventivo gratuito
@@ -572,7 +575,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     <div id="vista-form">
       <h3 id="dlg-t">Richiedi il tuo preventivo</h3>
       <p class="s">Gratuito e senza impegno. Ti richiamiamo entro un giorno lavorativo.</p>
-      <form id="lead-form" name="preventivo" method="POST" action="https://formsubmit.co/ajax/sprint@someca.it" novalidate>
+      <form id="lead-form" name="preventivo" method="POST" action="https://lyra-8c237e00.base44.app/functions/somecaLead" novalidate>
         <input type="hidden" name="form-name" value="preventivo">
         <p class="hp" aria-hidden="true"><label>Non compilare<input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="mix" aria-label="Panoramica prodotti">
@@ -729,21 +732,23 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     $('#wa').href='https://wa.me/'+NUMERO_WHATSAPP+'?text='+encodeURIComponent(righe.join('\n'));
     try{
       const payload={
-        Nome:dati.get('nome')||'',
-        Telefono:dati.get('telefono')||'',
-        Prodotto:dati.get('prodotto')||'',
-        Comune:dati.get('comune')||'-',
-        Messaggio:dati.get('messaggio')||'-',
-        ConsensoPrivacy:dati.get('privacy')||'',
-        _subject:'Nuova richiesta preventivo - sito Someca',
-        _cc:'info@someca.it,matrisciano.sebastiano@gmail.com',
-        _template:'table',
-        _captcha:'false'
+        nome:dati.get('nome')||'',
+        telefono:dati.get('telefono')||'',
+        prodotto:dati.get('prodotto')||'',
+        comune:dati.get('comune')||'',
+        messaggio:dati.get('messaggio')||'',
+        privacy:dati.get('privacy')||'',
+        bot_field:dati.get('bot-field')||''
       };
-      const r=await fetch('https://formsubmit.co/ajax/sprint@someca.it',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+      const r=await fetch('https://lyra-8c237e00.base44.app/functions/somecaLead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const esito=await r.json().catch(()=>({}));
+      if(!r.ok||esito.ok!==true) throw new Error('invio non riuscito');
       if(!r.ok) throw new Error('invio non riuscito');
     }catch(_){
-      err.textContent='Invio non riuscito. Riprova tra poco oppure chiamaci al +39 081 519 8379.'; err.style.display='block'; return;
+      err.textContent='Invio automatico non riuscito: ti apriamo WhatsApp con la richiesta già scritta.';
+      err.style.display='block';
+      window.open($('#wa').href,'_blank');
+      return;
     }
     trk('Lead',{content_name:dati.get('prodotto')});
     vForm.style.display='none'; vOk.style.display='block'; form.reset();
