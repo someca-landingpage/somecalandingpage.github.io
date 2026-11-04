@@ -609,7 +609,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     </div>
     <div class="ok" id="vista-ok">
       <h3>Richiesta inviata. Grazie!</h3>
-      <p class="sub" style="margin:0 auto 18px">Ti ricontatteremo al più presto. Se preferisci fare prima, scrivici anche su WhatsApp:</p>
+      <p class="sub" style="margin:0 auto 18px">Ti richiamiamo noi entro un giorno lavorativo. Se preferisci fare prima, scrivici anche su WhatsApp:</p>
       <p><a id="wa" href="#" target="_blank" rel="noopener">Continua su WhatsApp →</a></p>
     </div>
   </div>
@@ -731,21 +731,7 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
     if(dati.get('messaggio')) righe.push('Messaggio: '+dati.get('messaggio'));
     $('#wa').href='https://wa.me/'+NUMERO_WHATSAPP+'?text='+encodeURIComponent(righe.join('\n'));
     try{
-      const inviaEmail=async()=>{
-        const r=await fetch('https://formsubmit.co/ajax/sprint@someca.it',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
-          Nome:dati.get('nome')||'',
-          Telefono:dati.get('telefono')||'',
-          Prodotto:dati.get('prodotto')||'',
-          Comune:dati.get('comune')||'-',
-          Messaggio:dati.get('messaggio')||'-',
-          _subject:'Nuova richiesta preventivo - sito Someca',
-          _cc:'info@someca.it,matrisciano.sebastiano@gmail.com',
-          _template:'table',
-          _captcha:'false'
-        })});
-        return r.ok;
-      };
-      const salvaBackup=async()=>{
+      const invia=async()=>{
         const r=await fetch('https://lyra-8c237e00.base44.app/functions/somecaLead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
           nome:dati.get('nome')||'',
           telefono:dati.get('telefono')||'',
@@ -755,12 +741,12 @@ const trk=(ev,d)=>{try{window.fbq&&fbq('track',ev,d||{})}catch(_){}};
           privacy:dati.get('privacy')||'',
           bot_field:dati.get('bot-field')||''
         })});
-        return r.ok;
+        if(!r.ok) return false;
+        const j=await r.json().catch(()=>({ok:true}));
+        return j.ok!==false;
       };
-      let emailOk=false, backupOk=false;
-      try{ emailOk=await inviaEmail(); }catch(_){ emailOk=false; }
-      if(!emailOk){ try{ backupOk=await salvaBackup(); }catch(_){ backupOk=false; } }
-      if(!emailOk && !backupOk) throw new Error('invio non riuscito');
+      const ok=await invia();
+      if(!ok) throw new Error('invio non riuscito');
     }catch(_){
       err.textContent='Invio automatico non riuscito: ti apriamo WhatsApp con la richiesta già scritta.';
       err.style.display='block';
